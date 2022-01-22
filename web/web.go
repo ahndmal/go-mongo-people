@@ -2,8 +2,8 @@ package web
 
 import (
 	"encoding/json"
+	"github.com/AndriiMaliuta/go-mongo-people/storage"
 	"github.com/julienschmidt/httprouter"
-	"go-mongo-people/storage"
 	"log"
 	"net/http"
 )

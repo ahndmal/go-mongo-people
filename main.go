@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"go-mongo-people/storage"
-	"go-mongo-people/web"
+	"github.com/AndriiMaliuta/go-mongo-people/storage"
+	"github.com/AndriiMaliuta/go-mongo-people/web"
 	"log"
 	"net/http"
 	"os"

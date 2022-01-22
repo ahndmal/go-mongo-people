@@ -1,4 +1,4 @@
-module go-mongo-people
+module github.com/AndriiMaliuta/go-mongo-people
 
 go 1.18
 
