@@ -3,68 +3,48 @@ package main
 import (
 	"context"
 	"fmt"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
+	"github.com/qiniu/qmgo"
+	"go-mongo-people/storage"
+	"go.mongodb.org/mongo-driver/bson"
 	"log"
 	"os"
 )
 
 func main() {
 
-	var err error
-	mongoURL := os.Getenv("MONGO_URL")
-	if mongoURL == "" {
-		log.Panicln("MONGO_URL not provided")
-	}
-	fmt.Println(mongoURL)
-	if err != nil {
-		log.Panicln(err)
-	}
-	//session, err2 := mgo.Dial(mongoURL)
-	//fmt.Println(session)
-	//
-	//if err2 != nil {
-	//	log.Panicln(err2)
-	//}
-	//
-	//var pers storage.Person
-	//c := session.DB("people").C("person")
-	//err3 := c.Find("").One(&pers)
-	//
-	//if err3 != nil {
-	//	log.Fatal(err3)
-	//}
-	//fmt.Println(pers)
+	mongoUrl := os.Getenv("MONGO_URL")
 
-	//info := &mgo.CollectionInfo{}
-	//err = session.DB("").C("kudos").Create(info)
+	ctx := context.Background()
+	client, err := qmgo.NewClient(ctx, &qmgo.Config{Uri: mongoUrl})
+	db := client.Database("people")
+	coll := db.Collection("person") // 'person' colletion
+	client.Ping(10)
 
-	//count, err := session.DB("people").C("person").Count()
-	////person, err := serv.Service{}.GetPersonById(2606)
-	//if err != nil {
-	//	log.Panicln("ERROR !!!")
-	//	log.Panicln(err)
-	//}
-	//log.Println(count)
-	//defer session.Close()
+	fmt.Println(client)
+	fmt.Println(coll)
+	fmt.Println(mongoUrl)
 
-	// ==============================
-	//ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoURL))
-
-	if err != nil {
-		log.Panicln(err)
-	}
 	defer func() {
-		if err = client.Disconnect(context.TODO()); err != nil {
+		if err = client.Close(ctx); err != nil {
 			log.Panicln(err)
 		}
 	}()
 
-	// Ping the primary
-	if err2 := client.Ping(context.TODO(), readpref.Primary()); err != nil {
-		log.Panicln(err2)
+	batch := []storage.Person{}
+	coll.Find(ctx, bson.M{"age": 36}).Sort("age").Limit(7).All(&batch)
+
+	fmt.Println(batch)
+
+	pers := storage.Person{}
+	err = coll.Find(ctx, bson.M{"name": "123"}).One(pers)
+	fmt.Println(pers)
+
+	// ============================== CORE Client
+	//ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	//client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoURL))
+
+	if err != nil {
+		log.Panicln(err)
 	}
-	fmt.Println("Successfully connected and pinged.")
+
 }

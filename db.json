@@ -1,0 +1,12 @@
+{
+        "data_db": {
+                "db_type": "mongo",
+                "db_host": "host1.com:27017,host2.com:27017,host3.com",
+                "db_port": 27017,
+                "db_name": "staging?replicaSet=sr&authSource=admin&ssl=true",
+                "db_user": "user",
+                "db_password": "password",
+                "load_history_size": 10
+        },
+        "URL": "https://github.com/cgrates/cgrates/blob/master/data/conf/samples/mongoatlas/cgrates.json#L20"
+}
