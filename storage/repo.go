@@ -2,7 +2,6 @@ package storage
 
 import (
 	"context"
-	"fmt"
 	"github.com/qiniu/qmgo"
 	"go.mongodb.org/mongo-driver/bson"
 	"log"
@@ -60,14 +59,17 @@ func (m MongoRepo) AllPersons() []Person {
 
 }
 
-func (m MongoRepo) FindByAge(limit int, age int) Person {
+func (m MongoRepo) FindByAge(limit int64, age int) []Person {
 	ctx := context.Background()
-	pers := Person{}
-	err := m.GetCollection().Find(ctx, bson.M{"age": age}).One(pers)
-	fmt.Println(pers)
+	all := make([]Person, 0)
+
+	err := m.GetCollection().Find(ctx, bson.M{"age": age}).Limit(limit).All(&all)
 
 	if err != nil {
 		log.Panicln(err)
 	}
-	return pers
+	for _, p := range all {
+		all = append(all, p)
+	}
+	return all
 }
