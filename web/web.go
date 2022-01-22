@@ -1,8 +1,10 @@
 package web
 
 import (
-	"fmt"
+	"encoding/json"
+	"github.com/julienschmidt/httprouter"
 	"go-mongo-people/storage"
+	"log"
 	"net/http"
 )
 
@@ -11,16 +13,52 @@ type Service struct {
 	Router http.Handler
 }
 
-func InitServer() {
-	port := ":8082"
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		//todo
-	})
+func New(repo storage.MongoRepo) Service {
+	service := Service{
+		repo: repo,
+	}
 
-	fs := http.FileServer(http.Dir("static/"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
+	router := httprouter.New()
+	router.GET("/persons", service.Index)
+	//router.POST("/persons", service.Create)
+	//router.DELETE("/persons/:id", service.Delete)
+	//router.PUT("/persons/:id", service.Update)
 
-	fmt.Println("Server is UP on port ")
+	service.Router = UseMiddlewares(router)
 
-	http.ListenAndServe(port, nil)
+	return service
 }
+
+func (s Service) Index(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+
+	persBts, err := json.Marshal(s.repo.AllPersons())
+	if err != nil {
+		log.Panicln(err)
+	}
+	resp := []byte(persBts)
+	w.Write(resp)
+}
+
+func UseMiddlewares(h http.Handler) http.Handler {
+	//h = JSONApi(h)
+	//h = OktaAuth(h)
+	//h = Cors(h)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("%s: %s", r.Method, r.RequestURI)
+		h.ServeHTTP(w, r)
+	})
+}
+
+//func InitServer() {
+//	port := ":8082"
+//	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+//
+//	})
+//
+//	fs := http.FileServer(http.Dir("static/"))
+//	http.Handle("/static/", http.StripPrefix("/static/", fs))
+//
+//	fmt.Println("Server is UP on port ")
+//
+//	http.ListenAndServe(port, nil)
+//}
