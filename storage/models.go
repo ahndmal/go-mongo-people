@@ -1,11 +1,17 @@
 package storage
 
+import "time"
+
 type Person struct {
-	UserID      string `json:"user_id" bson:"userId"`
-	RepoID      string `json:"id" bson:"repoId"`
-	RepoName    string `json:"full_name" bson:"repoName"`
-	RepoURL     string `json:"html_url" bson:"repoUrl"`
-	Language    string `json:"language" bson:"language"`
-	Description string `json:"description" bson:"description"`
-	Notes       string `json:"notes" bson:"notes"`
+	Id          int       `json:"id" bson:"id"`
+	Name        string    `json:"name" bson:"name"`
+	FullName    string    `json:"fullName" bson:"fullName"`
+	Email       string    `json:"email" bson:"email"`
+	Gender      string    `json:"gender" bson:"gender"`
+	Status      string    `json:"status" bson:"status"`
+	Age         int       `json:"age" bson:"age"`
+	HasChildren bool      `json:"hasChildren"`
+	Engaged     bool      `json:"engaged"`
+	CreatedAt   time.Time `json:"createdAt"`
+	CountryId   string    `json:"countryId" bson:"countryId"`
 }
